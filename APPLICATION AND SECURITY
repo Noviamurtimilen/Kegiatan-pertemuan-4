@@ -1,0 +1,83 @@
+<?php
+include "koneksi.php";
+$id_user = $_POST['id_user'];
+$nama = $_POST['nama'];
+$email = $_POST['email'];
+$pass = md5($_POST[password]);
+$sql = "INSERT INTO users(id_user,password, nama, email) VALUES ('$id_user', '$pass',
+'$nama','$email')";
+$query=mysqli_query($con, $sql);
+mysqli_close($con);
+header('location:tampil_user.php');
+?>
+<?php
+include "koneksi.php";
+$id_user = $_POST['id_user'];
+$pass=md5($_POST['paswd']);
+$sql="SELECT * FROM users WHERE id_user='$id_user' AND password='$pass'";
+$login=mysqli_query($con,$sql);
+$ketemu=mysqli_num_rows($login);
+$r= mysqli_fetch_array($login);
+if ($ketemu > 0){
+session_start();
+$_SESSION['iduser'] = $r['id_user'];
+$_SESSION['passuser'] = $r['password'];
+echo"USER BERHASIL LOGIN<br>";
+echo "id user =",$_SESSION['iduser'],"<br>";
+echo "password=",$_SESSION['passuser'],"<br>";
+echo "<a href=logout.php><b>LOGOUT</b></a></center>";
+}
+else{
+echo "<center>Login gagal! username & password tidak benar<br>";
+echo "<a href=form_login.php><b>ULANGILAGI</b></a></center>";
+}
+mysqli_close($con);
+?>
+<?php
+echo "<h2>Login</h2>
+<form method=post action=cek_login.php>
+<table>
+<tr><td>Username</td><td> : <input name='id_user' type='text'></td></tr>
+<tr><td>Password</td><td> : <input name='paswd' type='text'></td></tr>
+<tr><td colspan=2><input type='submit' value='LOGIN'></td></tr>
+</table>
+</form>";
+?><?php
+echo "<h2>Tambah User</h2>
+<form method=post action=input_user.php>
+<table>
+<tr><td>Username</td><td> : <input name='id_user' type='text'></td></tr>
+<tr><td>Password</td><td> : <input name='password' type='password'></td></tr>
+<tr><td>Nama Lengkap</td><td> : <input name='nama' type='text'></td></tr>
+<tr><td>Email </td><td> : <input name='email' type='text'></td></tr>
+<tr><td colspan=2><input type='submit' value='SIMPAN'></td></tr>
+</table>
+</form>";
+?><?php
+echo "<h2>User</h2>
+<form method=POST action=form_user.php>
+<input type=submit value='Tambah User'>
+</form>
+<table>
+<tr><th>No</th><th>Username</th><th>NamaLengkap</th><th>Email</th><th>Aksi</th
+></tr>";
+include "koneksi.php";
+$sql="select * from users order by id_user";
+$tampil = mysqli_query($con,$sql);
+if (mysqli_num_rows($tampil) > 0) {
+$no=1;
+while ($r = mysqli_fetch_array($tampil))
+{
+echo "<tr><td>$no</td><td>$r[id_user]</td>
+<td>$r[nama]</td>
+<td>$r[email]</td>
+<td><a href='hapus_user.php?id=$r[id_user]'>Hapus</a></td>
+</tr>";
+$no++;
+}
+echo "</table>";
+} else {
+echo "0 results";
+}
+mysqli_close($con);
+?>
